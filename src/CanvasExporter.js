@@ -52,7 +52,7 @@ export class CanvasExporter {
     const a = document.createElement("a");
     a.style = "display: none;";
     a.href = url;
-    a.download = "fileName";
+    a.download = fileName;
 
     document.body.appendChild(a);
     // Trigger the file download
