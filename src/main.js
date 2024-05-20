@@ -3,9 +3,13 @@ import { setupCounter } from "./counter.js";
 import { initFileLoader } from "./fileLoader.js";
 import * as debugLayer from "./debugLayer.js";
 import { replaceObject, animate } from "./threeViewer.js";
+import { SketchManual } from "./SketchManual.js";
 
 const app = {
   viewMode: false,
+  smallScreen: false,
+  touchDevice: false,
+  domElement: document.getElementById("app"),
 };
 
 function setup() {
@@ -14,11 +18,15 @@ function setup() {
   debugLayer.initDebugLayer();
   debugLayer.addObject(app);
   setupKeyInput();
+  app.sketchManual = new SketchManual();
 
   const serialButton = document.getElementById("serial-button");
   serialButton.onclick = () => {
     console.log("click");
   };
+
+  window.onresize = resize;
+  resize();
 
   update();
 }
@@ -51,6 +59,17 @@ function processKeyInput(e) {
 function toggleViewMode() {
   console.log("toggle view mode");
   app.viewMode = !app.viewMode;
+}
+
+function resize() {
+  const width = window.innerWidth;
+  if (width < 600) {
+    app.smallScreen = true;
+    app.sketchManual.setSmallScreenGuides(true);
+  } else {
+    app.smallScreen = false;
+    app.sketchManual.setSmallScreenGuides(false);
+  }
 }
 
 // ---------
