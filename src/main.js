@@ -4,21 +4,25 @@ import { initFileLoader } from "./fileLoader.js";
 import * as debugLayer from "./debugLayer.js";
 import { replaceObject, animate } from "./threeViewer.js";
 import { SketchManual } from "./SketchManual.js";
+import { CanvasExporter } from "./CanvasExporter.js";
 
 const app = {
   viewMode: false,
   smallScreen: false,
   touchDevice: false,
   domElement: document.getElementById("app"),
+  canvas: document.getElementById("canvas"),
 };
 
 function setup() {
+  app.sketchManual = new SketchManual();
+  app.canvasExporter = new CanvasExporter(app.canvas);
+
   setupCounter(document.querySelector("#counter"));
   initFileLoader();
+  setupKeyInput();
   debugLayer.initDebugLayer();
   debugLayer.addObject(app);
-  setupKeyInput();
-  app.sketchManual = new SketchManual();
 
   const serialButton = document.getElementById("serial-button");
   serialButton.onclick = () => {
@@ -52,6 +56,12 @@ function processKeyInput(e) {
       break;
     case "KeyD":
       debugLayer.toggleDebugLayer();
+      break;
+    case "KeyR":
+      app.canvasExporter.toggleRecord();
+      break;
+    case "KeyS":
+      app.canvasExporter.saveImage();
       break;
   }
 }

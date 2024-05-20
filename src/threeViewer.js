@@ -1,6 +1,8 @@
+import { render } from "sass";
 import * as THREE from "three";
 
 const containerElement = document.getElementById("app");
+const canvas = document.getElementById("canvas");
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -11,9 +13,13 @@ const camera = new THREE.PerspectiveCamera(
 
 let object;
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({
+  canvas: canvas,
+  preserveDrawingBuffer: true,
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000, 0);
 containerElement.appendChild(renderer.domElement);
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
