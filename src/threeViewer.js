@@ -1,5 +1,6 @@
 import { render } from "sass";
 import * as THREE from "three";
+import { ThreeExporter } from "./ThreeExporter";
 
 const containerElement = document.getElementById("app");
 const canvas = document.getElementById("canvas");
@@ -34,6 +35,8 @@ object = cube;
 
 camera.position.z = 5;
 
+const exporter = new ThreeExporter();
+
 animate();
 
 export function replaceObject(newObject) {
@@ -53,4 +56,8 @@ export function animate() {
   object.rotation.x += 0.01;
   object.rotation.y += 0.01;
   renderer.render(scene, camera);
+}
+
+export function exportScene() {
+  exporter.exportGlTF(scene);
 }

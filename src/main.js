@@ -2,7 +2,7 @@ import "./styles/global.scss";
 import { setupCounter } from "./counter.js";
 import { initFileLoader } from "./fileLoader.js";
 import * as debugLayer from "./debugLayer.js";
-import { replaceObject, animate } from "./threeViewer.js";
+import { replaceObject, animate, exportScene } from "./threeViewer.js";
 import { SketchManual } from "./SketchManual.js";
 import { CanvasExporter } from "./CanvasExporter.js";
 
@@ -62,6 +62,9 @@ function processKeyInput(e) {
       break;
     case "KeyS":
       app.canvasExporter.saveImage();
+      break;
+    case "KeyO":
+      exportScene();
       break;
   }
 }
