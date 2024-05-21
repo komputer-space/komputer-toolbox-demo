@@ -31,18 +31,19 @@ function dropHandler(e) {
     console.log("file extension: " + fileExtension);
 
     switch (fileExtension) {
-      case "jpg" ||
-        "jpeg" ||
-        "png" ||
-        "webp" ||
-        "JPG" ||
-        "JPEG" ||
-        "PNG" ||
-        "WEBP":
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "webp":
+      case "JPG":
+      case "JPEG":
+      case "PNG":
+      case "WEBP":
         console.log("filetype: image");
         readFile(file, processImage);
         break;
-      case "glb" || "gltf":
+      case "gltf":
+      case "glb":
         console.log("filetype: gltf");
         readFile(file, processGlTF);
         break;
