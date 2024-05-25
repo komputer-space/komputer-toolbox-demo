@@ -41,6 +41,7 @@ function setup() {
 function update() {
   animate();
   debugLayer.updateDebug();
+  if (document.activeElement != document.body) document.activeElement.blur();
   if (app.serialInput.connected) console.log(app.serialInput.serialData);
   requestAnimationFrame(update);
 }
