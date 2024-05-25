@@ -5,6 +5,7 @@ import * as debugLayer from "./debugLayer.js";
 import { replaceObject, animate, exportScene } from "./threeViewer.js";
 import { SketchManual } from "./SketchManual.js";
 import { CanvasExporter } from "./CanvasExporter.js";
+import { SerialInput } from "./SerialInput.js";
 
 const app = {
   viewMode: false,
@@ -17,12 +18,14 @@ const app = {
 function setup() {
   app.sketchManual = new SketchManual();
   app.canvasExporter = new CanvasExporter(app.canvas);
+  app.serialInput = new SerialInput(115200);
 
   setupCounter(document.querySelector("#counter"));
   initFileLoader();
   setupKeyInput();
   debugLayer.initDebugLayer();
   debugLayer.addObject(app);
+  debugLayer.addObject(app.serialInput);
 
   const serialButton = document.getElementById("serial-button");
   serialButton.onclick = () => {
@@ -38,6 +41,7 @@ function setup() {
 function update() {
   animate();
   debugLayer.updateDebug();
+  if (app.serialInput.connected) console.log(app.serialInput.serialData);
   requestAnimationFrame(update);
 }
 
