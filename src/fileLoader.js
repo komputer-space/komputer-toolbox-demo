@@ -12,13 +12,6 @@ export function initFileLoader() {
   dropZone.ondragleave = dragLeaveHandler;
 }
 
-export function initFileUpload() {
-  console.log("init");
-  dropZone.ondrop = dropHandler;
-  dropZone.ondragover = dragOverHandler;
-  dropZone.ondragleave = dragLeaveHandler;
-}
-
 function dropHandler(e) {
   console.log("File(s) dropped");
   // Prevent default behavior (Prevent file from being opened)
@@ -70,6 +63,7 @@ function readFile(file, processor) {
   const reader = new FileReader();
   reader.onload = function (e) {
     const url = e.target.result;
+    console.log(url);
     processor(url);
   };
   reader.readAsDataURL(file);

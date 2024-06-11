@@ -37,8 +37,6 @@ camera.position.z = 5;
 
 const exporter = new ThreeExporter();
 
-animate();
-
 export function replaceObject(newObject) {
   console.log("replace");
   scene.remove(object);

@@ -6,6 +6,7 @@ import { replaceObject, animate, exportScene } from "./threeViewer.js";
 import { SketchManual } from "./SketchManual.js";
 import { CanvasExporter } from "./CanvasExporter.js";
 import { SerialInput } from "./SerialInput.js";
+import { setupWorkspace } from "./workspaceHandler.js";
 
 const app = {
   viewMode: false,
@@ -21,6 +22,7 @@ function setup() {
   app.serialInput = new SerialInput(115200);
 
   setupCounter(document.querySelector("#counter"));
+  setupWorkspace();
   initFileLoader();
   setupKeyInput();
   debugLayer.initDebugLayer();
@@ -41,7 +43,7 @@ function setup() {
 function update() {
   animate();
   debugLayer.updateDebug();
-  if (document.activeElement != document.body) document.activeElement.blur();
+  // if (document.activeElement != document.body) document.activeElement.blur();
   if (app.serialInput.connected) console.log(app.serialInput.serialData);
   requestAnimationFrame(update);
 }
@@ -51,7 +53,7 @@ setup();
 // ---------
 
 function setupKeyInput() {
-  document.onkeydown = processKeyInput;
+  // document.onkeydown = processKeyInput;
 }
 
 function processKeyInput(e) {
