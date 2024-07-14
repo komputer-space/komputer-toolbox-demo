@@ -9,7 +9,9 @@ export class Tool {
   constructor(canvas) {
     this.transparencyMode = false;
     this.freeze = false;
-    this.currentFilter = 0;
+
+    this.exampleIndex = 0;
+    this.examples = ["macintosh", "mate"];
 
     this.exporter = new ThreeExporter();
     this.loader = new FileImporter(this);
@@ -78,6 +80,14 @@ export class Tool {
     this.transparencyMode = value;
   }
 
+  loadNewExample() {
+    console.log("loading next example");
+    this.exampleIndex++;
+    if (this.exampleIndex >= this.examples.length) this.exampleIndex = 0;
+    const fileName = this.examples[this.exampleIndex];
+    this.importGlTF("/examples/" + fileName + ".glb");
+  }
+
   // --- CUSTOM METHODS
 
   replaceObject(newObject) {
@@ -93,6 +103,25 @@ export class Tool {
     this.object = newObject;
   }
 
+  adaptObjectToScene(object) {
+    console.log("adapt");
+    const box = new THREE.Box3().setFromObject(object);
+    const offsetPosition = box.getCenter(new THREE.Vector3());
+    const scaleFactor = 2 / box.getSize(new THREE.Vector3()).y;
+    console.log(scaleFactor);
+    const wrapperObject = new THREE.Group();
+    wrapperObject.add(object);
+    const adaptedPosition = object.position.clone().sub(offsetPosition);
+    object.position.copy(adaptedPosition.multiplyScalar(scaleFactor));
+    object.scale.multiplyScalar(scaleFactor);
+    wrapperObject.traverse((obj) => {
+      obj.receiveShadow = false;
+      if (obj.isMesh) obj.geometry.computeVertexNormals();
+    });
+    console.log(wrapperObject);
+    return wrapperObject;
+  }
+
   // --- FILE EXPORTS
 
   exportScene() {
@@ -106,7 +135,7 @@ export class Tool {
     this.gltfLoader.load(
       url,
       (gltf) => {
-        let importedObject = gltf.scene;
+        let importedObject = this.adaptObjectToScene(gltf.scene);
         this.replaceObject(importedObject);
         this.infoLayer.setActive(false);
       },

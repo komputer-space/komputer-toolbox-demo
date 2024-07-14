@@ -71,6 +71,9 @@ function processKeyInput(e) {
       case "KeyO":
         if (app.viewMode) app.tool.exportScene();
         break;
+      case "Tab":
+        if (!app.viewMode) app.tool.loadNewExample();
+        break;
       case "Escape":
         window.location.replace("https://toolbox.komputer.space");
         break;
