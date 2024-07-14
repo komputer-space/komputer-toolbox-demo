@@ -19,6 +19,7 @@
   --accent-orange: #ff5414;
   --accent-blue: #6c52df;
   --accent-green: #00ff9e;
+  
 }
 
 body {
@@ -36,6 +37,12 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+em,
+i {
+  font-variation-settings: "slnt" -10, "CRSV" 1, "MONO" 1;
+  font-style: normal;
 }
 
 #app {
