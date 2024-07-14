@@ -9,6 +9,7 @@ export class Tool {
   constructor(canvas) {
     this.transparencyMode = false;
     this.freeze = false;
+    this.idle = false;
 
     this.exampleIndex = 0;
     this.examples = ["macintosh", "mate"];
@@ -62,6 +63,9 @@ export class Tool {
       this.object.rotation.x += 0.01;
       this.object.rotation.y += 0.01;
     }
+    if (this.idle) {
+      this.object.rotation.z += 0.01;
+    }
 
     this.renderer.render(this.scene, this.camera);
   }
@@ -78,6 +82,10 @@ export class Tool {
 
   setTransparencyMode(value) {
     this.transparencyMode = value;
+  }
+
+  setIdleMode(value) {
+    this.idle = value;
   }
 
   loadNewExample() {

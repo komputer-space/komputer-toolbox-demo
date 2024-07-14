@@ -10,6 +10,7 @@ import { setupWorkspace } from "./workspaceHandler.js";
 const app = {
   viewMode: false,
   inputActive: true,
+  inputTimeout: null,
   transparencyMode: false,
   smallScreen: false,
   touchDevice: false,
@@ -23,6 +24,15 @@ function setup() {
   // app.serialInput = new SerialInput(115200);
   app.tool = new Tool(app.canvas);
 
+  setupInputs();
+  document.onkeydown = processKeyInput;
+  document.onmousemove = inputTimeout;
+
+  setupCounter(document.querySelector("#counter"));
+  setupWorkspace();
+
+  window.onresize = resize;
+
   app.transparencyLayer = new TransparencyLayer();
   app.transparencyLayer.addObject(app, "Application");
   app.transparencyLayer.addObject(app.transparencyLayer, "Transparency Layer");
@@ -31,15 +41,9 @@ function setup() {
 
   setTransparencyMode(true);
 
-  setupInputs();
-  document.onkeydown = processKeyInput;
-
-  setupCounter(document.querySelector("#counter"));
-  setupWorkspace();
-
-  window.onresize = resize;
   resize();
   update();
+  inputTimeout();
 }
 
 function update() {
@@ -53,6 +57,7 @@ setup();
 // ---------
 
 function processKeyInput(e) {
+  inputTimeout();
   if (app.inputActive) {
     document.activeElement.blur();
     switch (e.code) {
@@ -79,6 +84,15 @@ function processKeyInput(e) {
         break;
     }
   }
+}
+
+function inputTimeout() {
+  app.tool.setIdleMode(false);
+  clearTimeout(app.inputTimeout);
+  app.inputTimeout = setTimeout(function () {
+    console.log("input timeout, enter idle");
+    app.tool.setIdleMode(true);
+  }, 5000);
 }
 
 function setupInputs() {
