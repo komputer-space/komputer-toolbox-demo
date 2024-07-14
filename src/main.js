@@ -1,15 +1,17 @@
 import "./styles/global.scss";
-import { setupCounter } from "./counter.js";
-import { initFileLoader } from "./fileLoader.js";
-import * as debugLayer from "./debugLayer.js";
-import { replaceObject, animate, exportScene } from "./threeViewer.js";
+import { TransparencyLayer } from "./TransparencyLayer.js";
+import { Tool } from "./Tool.js";
 import { SketchManual } from "./SketchManual.js";
 import { CanvasExporter } from "./CanvasExporter.js";
-import { SerialInput } from "./SerialInput.js";
+
+import { setupCounter } from "./counter.js";
 import { setupWorkspace } from "./workspaceHandler.js";
 
 const app = {
   viewMode: false,
+  inputActive: true,
+  inputTimeout: null,
+  transparencyMode: false,
   smallScreen: false,
   touchDevice: false,
   domElement: document.getElementById("app"),
@@ -19,32 +21,34 @@ const app = {
 function setup() {
   app.sketchManual = new SketchManual();
   app.canvasExporter = new CanvasExporter(app.canvas);
-  app.serialInput = new SerialInput(115200);
+  // app.serialInput = new SerialInput(115200);
+  app.tool = new Tool(app.canvas);
+
+  setupInputs();
+  document.onkeydown = processKeyInput;
+  document.onmousemove = inputTimeout;
 
   setupCounter(document.querySelector("#counter"));
   setupWorkspace();
-  initFileLoader();
-  setupKeyInput();
-  debugLayer.initDebugLayer();
-  debugLayer.addObject(app);
-  debugLayer.addObject(app.serialInput);
-
-  const serialButton = document.getElementById("serial-button");
-  serialButton.onclick = () => {
-    console.log("click");
-  };
 
   window.onresize = resize;
-  resize();
 
+  app.transparencyLayer = new TransparencyLayer();
+  app.transparencyLayer.addObject(app, "Application");
+  app.transparencyLayer.addObject(app.transparencyLayer, "Transparency Layer");
+  app.transparencyLayer.addObject(app.sketchManual.settings, "Settings");
+  app.transparencyLayer.addObject(app.tool, "Tool");
+
+  setTransparencyMode(true);
+
+  resize();
   update();
+  inputTimeout();
 }
 
 function update() {
-  animate();
-  debugLayer.updateDebug();
-  // if (document.activeElement != document.body) document.activeElement.blur();
-  if (app.serialInput.connected) console.log(app.serialInput.serialData);
+  app.tool.update();
+  app.transparencyLayer.updateDebug();
   requestAnimationFrame(update);
 }
 
@@ -52,37 +56,82 @@ setup();
 
 // ---------
 
-function setupKeyInput() {
-  // document.onkeydown = processKeyInput;
+function processKeyInput(e) {
+  inputTimeout();
+  if (app.inputActive) {
+    document.activeElement.blur();
+    switch (e.code) {
+      case "KeyF":
+        toggleViewMode();
+        break;
+      case "Space":
+        toggleTransparencyMode();
+        break;
+      case "KeyR":
+        app.canvasExporter.toggleRecord();
+        break;
+      case "KeyS":
+        if (app.viewMode) app.canvasExporter.saveImage();
+        break;
+      case "KeyO":
+        if (app.viewMode) app.tool.exportScene();
+        break;
+      case "Tab":
+        if (!app.viewMode) app.tool.loadNewExample();
+        break;
+      case "Escape":
+        window.location.replace("https://toolbox.komputer.space");
+        break;
+    }
+  }
 }
 
-function processKeyInput(e) {
-  switch (e.code) {
-    case "Space":
-      toggleViewMode();
-      break;
-    case "KeyD":
-      debugLayer.toggleDebugLayer();
-      break;
-    case "KeyR":
-      app.canvasExporter.toggleRecord();
-      break;
-    case "KeyS":
-      app.canvasExporter.saveImage();
-      break;
-    case "KeyO":
-      exportScene();
-      break;
-  }
+function inputTimeout() {
+  app.tool.setIdleMode(false);
+  clearTimeout(app.inputTimeout);
+  app.inputTimeout = setTimeout(function () {
+    console.log("input timeout, enter idle");
+    app.tool.setIdleMode(true);
+  }, 5000);
+}
+
+function setupInputs() {
+  // prevent tool inputs while typing into any text input fields
+  const inputs = Array.from(document.querySelectorAll("input[type=text]"));
+  inputs.forEach((input) => {
+    input.onfocus = () => {
+      app.inputActive = false;
+    };
+    input.onblur = () => {
+      app.inputActive = true;
+    };
+  });
 }
 
 function toggleViewMode() {
   console.log("toggle view mode");
   app.viewMode = !app.viewMode;
+  const viewModeIndicator = document.getElementById("view-mode-indicator");
+  viewModeIndicator.style.display = app.viewMode ? "flex" : "none";
+  app.tool.setViewMode(app.viewMode);
+}
+
+function toggleTransparencyMode() {
+  console.log("toggle transparency layer");
+  const active = !app.transparencyMode;
+  setTransparencyMode(active);
+}
+
+function setTransparencyMode(val) {
+  app.transparencyMode = val;
+  app.transparencyLayer.setActive(val);
+  app.tool.setTransparencyMode(val);
 }
 
 function resize() {
   const width = window.innerWidth;
+  const height = window.innerHeight;
+  app.tool.resize(width, height);
   if (width < 600) {
     app.smallScreen = true;
     app.sketchManual.setSmallScreenGuides(true);
@@ -90,14 +139,4 @@ function resize() {
     app.smallScreen = false;
     app.sketchManual.setSmallScreenGuides(false);
   }
-}
-
-// ---------
-
-export function importGlTF(object) {
-  replaceObject(object);
-}
-
-export function importImage(url) {
-  document.getElementById("img").src = url;
 }
