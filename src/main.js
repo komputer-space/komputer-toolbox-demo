@@ -21,7 +21,6 @@ const app = {
 function setup() {
   app.sketchManual = new SketchManual();
   app.canvasExporter = new CanvasExporter(app.canvas);
-  // app.serialInput = new SerialInput(115200);
   app.tool = new Tool(app.canvas);
 
   setupInputs();

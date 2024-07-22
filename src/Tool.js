@@ -15,7 +15,7 @@ export class Tool {
     this.examples = ["macintosh", "mate"];
 
     this.exporter = new ThreeExporter();
-    this.loader = new FileImporter(this);
+    this.importer = new FileImporter(this);
 
     this.infoLayer = new InfoLayer();
 

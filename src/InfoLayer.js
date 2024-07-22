@@ -8,6 +8,7 @@ export class InfoLayer {
 
   setActive(val) {
     this.infoLayerElement.style.display = val ? "flex" : "none";
+    if (!val) this.infoElement.innerText = "";
   }
 
   showLoadingIndicator(percentage) {
